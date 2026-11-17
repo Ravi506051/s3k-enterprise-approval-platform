@@ -1,18 +1,22 @@
-# Axis — Enterprise Request & Approval Platform
+# Axis: Enterprise Request and Approval Platform
 
-A functional, fictional purchase-request prototype for **S3K Case Study 03 / AI Platforms**. It has demo sign-in, server-side authorization, amount-based approval routes, document-presence checks, duplicate detection, a scoped status/policy assistant and an audit trail.
+A purchase-request prototype for **S3K Internship 2026, Case Study 03: AI Platforms**. Axis demonstrates request intake, document checks, duplicate hints, amount-based approval routing, role-aware decisions, a scoped status assistant, and an audit trail.
+
+**[Read the case study](CASE_STUDY.md)** · **[Download the source ZIP](downloads/s3k-enterprise-approval-platform.zip)**
 
 ## Run locally
+
+Requires Python 3.10 or newer. No external packages or API keys are needed.
 
 ```powershell
 python server.py
 ```
 
-Open `http://127.0.0.1:8767/`. Python 3.10+ standard library is the only requirement. SQLite is initialized automatically. Set `APPROVAL_DB` to use another database location.
+Open [http://127.0.0.1:8767/](http://127.0.0.1:8767/). SQLite is initialized automatically. Set `APPROVAL_DB` before launch if you want a different database path.
 
 ## Demo accounts
 
-Choose an account on the login screen. All use the fictional demo PIN **2468**.
+Select an account on the sign-in screen. Every fictional account uses PIN **2468**.
 
 | Role | Account |
 | --- | --- |
@@ -24,10 +28,22 @@ Choose an account on the login screen. All use the fictional demo PIN **2468**.
 | Manager, Marketing | `dev.manager@example.test` |
 | Department head, Marketing | `isha.head@example.test` |
 
-Create a request as an employee, then sign in as each approver in sequence. Requests up to ₹25,000 need a manager; ₹25,001–₹1,00,000 need manager and Finance; above ₹1,00,000 also need a department head. Missing documents hold a request before approval. “Document present” is a **demo confirmation**, not a file upload.
+## Approval flow
 
-The prototype uses server-side sessions and authorization checks, but it is **not production authentication**: demo PINs are public, sessions are in memory, and there is no SSO, CSRF token, rate limiting or tenant isolation. Never use real financial data. See [CASE_STUDY.md](CASE_STUDY.md) for design and UAT.
+| Request amount | Required approval route |
+| --- | --- |
+| Up to INR 25,000 | Manager |
+| INR 25,001 to INR 100,000 | Manager, then Finance |
+| Above INR 100,000 | Manager, Finance, then department head |
 
-## API
+Sign in as an employee and create a request. Then sign in as each approver in route order to review it. Try a request with missing documents to see the hold state; the **Document present** checkbox is a demo confirmation, not a file upload. The app also surfaces potential duplicates for review rather than silently blocking a request.
 
-`POST /api/login`, `POST /api/logout`, `GET /api/me`, `GET /api/state`, `GET /api/requests/{id}`, `POST /api/requests`, `POST /api/requests/{id}/documents`, `POST /api/requests/{id}/decision`, `POST /api/assistant`.
+The frontend is `index.html`, `styles.css`, and `app.js`. `server.py` provides the HTTP API, SQLite storage, sessions, and server-side role checks. [CASE_STUDY.md](CASE_STUDY.md) covers the problem, workflow, UI, KPIs, and UAT approach.
+
+## API at a glance
+
+`POST /api/login` · `POST /api/logout` · `GET /api/me` · `GET /api/state` · `GET /api/requests/{id}` · `POST /api/requests` · `POST /api/requests/{id}/documents` · `POST /api/requests/{id}/decision` · `POST /api/assistant`
+
+## Prototype boundaries
+
+Use fictional data only. The public demo PIN, in-memory sessions, and simplified document check are not suitable for production. The app has no SSO, CSRF protection, rate limiting, or tenant isolation. A production version would also need secure file storage, identity lifecycle controls, and policy governance.
